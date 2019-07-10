@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/:id/posts', async (req, res) => {
+router.post('/:id/posts', validateUserId, async (req, res) => {
     const id = req.params.id;
     const text = req.body.text;
     try {
@@ -55,7 +55,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateUserId,  async (req, res) => {
     const id = req.params.id;
     try {
         const user = await userDb.getById(id)
@@ -69,7 +69,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.get('/:id/posts', async (req, res) => {
+router.get('/:id/posts', validateUserId, async (req, res) => {
     const userId = req.params.id;
     try {
         const userPost = await userDb.getUserPosts(userId);
@@ -85,7 +85,7 @@ router.get('/:id/posts', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateUserId, async (req, res) => {
     const id = req.params.id;
     try {
         const count = await userDb.remove(id);
@@ -101,7 +101,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateUserId, async (req, res) => {
     const userData = req.body;
     const id = req.params.id
     try {
@@ -120,8 +120,19 @@ router.put('/:id', async (req, res) => {
 
 //custom middleware
 
-function validateUserId(req, res, next) {
-
+async function validateUserId(req, res, next) {
+    const { id } = req.params;
+    const user = await userDb.getById(id);
+    try{ 
+        if (user) {
+        req.user = user;
+        next();
+        } else {
+            res.status(400).json({ message: "user not found" })
+        }
+    } catch (error){
+        res.status(500).json({ message: 'unable to process request' })
+    }
 };
 
 function validateUser(req, res, next) {
