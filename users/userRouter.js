@@ -25,9 +25,9 @@ router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
             text
         });
         res.status(201).json(newPost);
-    } catch (err) {
+    } catch (error) {
       res.status(500).json({
-        message: err.toString()
+        message: 'failed to add new post'
       });
     }
 });
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
         const users = await userDb.get();
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: "error getting all users"})
+        res.status(500).json({ message: 'error getting all users'})
     }
 });
 
