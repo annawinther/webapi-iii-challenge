@@ -1,5 +1,7 @@
 const express = require('express');
 const userDb = require('./userDb');
+const postDb = require('../posts/postDb');
+
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -15,7 +17,32 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/:id/posts', async (req, res) => {
-
+    const id = req.params.id;
+    const text = req.body.text;
+    try {
+      const user = await postDb.getById(id);
+      if (!user) {
+        return res.status(404).json({
+          message: "User does not exist"
+        });
+      }
+  
+      if (!text) {
+        res.status(400).json({
+          message: "Text is required"
+        });
+      } else {
+        const newPost = await postDb.insert({
+          user_id: id,
+          text
+        });
+        res.status(201).json(newPost);
+      }
+    } catch (err) {
+      res.status(500).json({
+        message: err.toString()
+      });
+    }
 });
 
 router.get('/', async (req, res) => {
