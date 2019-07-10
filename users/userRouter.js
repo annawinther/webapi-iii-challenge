@@ -37,7 +37,6 @@ router.get('/', async (req, res) => {
         const users = await userDb.get();
         res.status(200).json(users);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: "error getting all users"})
     }
 });
