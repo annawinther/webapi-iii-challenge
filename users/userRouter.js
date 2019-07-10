@@ -57,7 +57,7 @@ router.delete('/:id', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({
-            message: 'Error removing the post',
+            message: 'Error removing the user',
           });
     }
 });
@@ -70,11 +70,11 @@ router.put('/:id', async (req, res) => {
         if(user) {
             res.status(200).json(userData)
         } else {
-            res.status(404).json({ message: 'The hub could not be found' });
+            res.status(404).json({ message: 'The user could not be found' });
         }
     } catch(error) {
         res.status(500).json({
-            message: 'Error updating the hub',
+            message: 'Error updating the user',
           });
     }
 });
