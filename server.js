@@ -16,7 +16,7 @@ server.get('/', logger, (req, res) => {
 //custom middleware
 
 function logger(req, res, next) {
-  console.log(`${req.method} Request, ${req.url}`);
+  console.log(`A ${req.method} request to ${req.url} at ${Date.now()}`);
   next();
 };
 
