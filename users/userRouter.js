@@ -4,7 +4,7 @@ const postDb = require('../posts/postDb');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validateUser, async (req, res) => {
     const userData = req.body;
     try{
         const user = await userDb.insert(userData);
@@ -16,11 +16,12 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/:id/posts', validateUserId, async (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, async (req, res) => {
     const id = req.params.id;
     const text = req.body.text;
     try {
       const user = await postDb.getById(id);
+      
       if (!user) {
         return res.status(404).json({
           message: "User does not exist"
@@ -45,7 +46,7 @@ router.post('/:id/posts', validateUserId, async (req, res) => {
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', validateUser, async (req, res) => {
     try {
         const users = await userDb.get();
         res.status(200).json(users);
@@ -55,7 +56,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', validateUserId,  async (req, res) => {
+router.get('/:id', validateUserId, async (req, res) => {
     const id = req.params.id;
     try {
         const user = await userDb.getById(id)
@@ -101,7 +102,7 @@ router.delete('/:id', validateUserId, async (req, res) => {
     }
 });
 
-router.put('/:id', validateUserId, async (req, res) => {
+router.put('/:id', validateUserId, validateUser, async (req, res) => {
     const userData = req.body;
     const id = req.params.id
     try {
@@ -135,12 +136,32 @@ async function validateUserId(req, res, next) {
     }
 };
 
-function validateUser(req, res, next) {
-
+async function validateUser(req, res, next) {
+    try {
+        if(!req.body){
+            res.status(400).json({ message: "missing user data" })
+        } else if (!req.body.name){
+            res.status(400).json({ message: "missing required name field" })
+        } else {
+            next()
+        }
+    } catch (error){
+        res.status(500).json({ message: "unable to process request" })
+    }
 };
 
-function validatePost(req, res, next) {
-
+async function validatePost(req, res, next) {
+    try {
+        if(!req.body){
+            res.status(400).json({ message: "missing user data" })
+        } else if (!req.body.text){
+            res.status(400).json({ message: "missing required text field" })
+        } else {
+            next()
+        }
+    } catch (error){
+        res.status(500).json({ message: "unable to process request" })
+    }
 };
 
 module.exports = router;
