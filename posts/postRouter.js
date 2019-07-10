@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', validatePostId, async (req, res) => {
     const id = req.params.id;
     try {
         const post = await postDb.getById(id)
@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validatePostId, async (req, res) => {
     const id = req.params.id;
     try {
         const count = await postDb.remove(id);
@@ -42,7 +42,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validatePostId, async (req, res) => {
     const postData = req.body;
     const id = req.params.id
     try {
@@ -61,8 +61,19 @@ router.put('/:id', async (req, res) => {
 
 // custom middleware
 
-function validatePostId(req, res, next) {
-    
+async function validatePostId(req, res, next) {
+    const { id } = req.params;
+    const post = await postDb.getById(id);
+    try {
+        if(post){
+            req.post = post;
+            next();
+        } else {
+            res.status(400).json({ message: "post not found" })
+        }
+    } catch (error){
+        res.status(500).json({ message: "unable to get posts" })
+    }
 };
 
 module.exports = router;

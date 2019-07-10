@@ -124,7 +124,7 @@ router.put('/:id', validateUserId, validateUser, async (req, res) => {
 async function validateUserId(req, res, next) {
     const { id } = req.params;
     const user = await userDb.getById(id);
-    try{ 
+    try { 
         if (user) {
         req.user = user;
         next();
