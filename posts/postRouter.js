@@ -7,7 +7,6 @@ router.get('/', async (req, res) => {
         const posts = await postDb.get();
         res.status(200).json(posts);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: "error getting all posts"})
     }
 });
@@ -16,11 +15,7 @@ router.get('/:id', validatePostId, async (req, res) => {
     const id = req.params.id;
     try {
         const post = await postDb.getById(id)
-        if (post) {
-            res.status(200).json(post);
-          } else {
-            res.status(404).json({ message: 'post with that is not found ' });
-          }
+        res.status(200).json(post);  
     } catch (error){
         res.status(500).json({ message: 'error getting post with that id'})
     }
@@ -29,12 +24,9 @@ router.get('/:id', validatePostId, async (req, res) => {
 router.delete('/:id', validatePostId, async (req, res) => {
     const id = req.params.id;
     try {
-        const count = await postDb.remove(id);
-        if( count > 0 ){
-            res.status(200).json({ message: `post with id ${id} has been deleted `})
-        } else {
-            res.status(404).json({ message: 'The post with that id could not be found' })
-        }
+        const count = await postDb.remove(id);    
+        res.status(200).json({ message: `post with id ${id} has been deleted `})
+
     } catch (error) {
         res.status(500).json({
             message: 'Error removing the post',
@@ -47,11 +39,8 @@ router.put('/:id', validatePostId, async (req, res) => {
     const id = req.params.id
     try {
         const post = await postDb.update(id, postData);
-        if(post) {
-            res.status(200).json(postData)
-        } else {
-            res.status(404).json({ message: 'The hub could not be found' });
-        }
+        res.status(200).json(postData)
+
     } catch(error) {
         res.status(500).json({
             message: 'Error updating the hub',
@@ -64,16 +53,12 @@ router.put('/:id', validatePostId, async (req, res) => {
 async function validatePostId(req, res, next) {
     const { id } = req.params;
     const post = await postDb.getById(id);
-    try {
-        if(post){
-            req.post = post;
-            next();
-        } else {
-            res.status(400).json({ message: "post not found" })
-        }
-    } catch (error){
-        res.status(500).json({ message: "unable to get posts" })
-    }
+    if(post){
+        req.post = post;
+        next();
+    } else {
+        res.status(400).json({ message: "post not found" })
+    } 
 };
 
 module.exports = router;
