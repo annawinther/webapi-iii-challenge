@@ -95,8 +95,8 @@ router.put('/:id', validateUserId, validateUser, async (req, res) => {
     const user = await userDb.getById(id);
 
     if (user) {
-    req.user = user;
-    next();
+        req.user = user;
+        next();
     } else {
         res.status(400).json({ message: "user not found" })
     }
